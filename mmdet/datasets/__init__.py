@@ -1,5 +1,5 @@
 from .builder import build_dataset
-from .cityscapes import CityscapesDataset
+# from .cityscapes import CityscapesDataset
 from .coco import CocoDataset
 from .custom import CustomDataset
 from .dataset_wrappers import ConcatDataset, RepeatDataset
@@ -12,7 +12,7 @@ from .underwater import UndeWaterDataset
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'VOCDataset',
-    'CityscapesDataset', 'GroupSampler', 'DistributedGroupSampler',
+    'GroupSampler', 'DistributedGroupSampler',
     'build_dataloader', 'ConcatDataset', 'RepeatDataset', 'WIDERFaceDataset',
     'DATASETS', 'build_dataset', 'UndeWaterDataset'
 ]
