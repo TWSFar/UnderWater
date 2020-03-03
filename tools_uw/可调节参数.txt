@@ -1,0 +1,13 @@
+backbone类型
+neck 类型
+
+rpn:
+    分类 loss => focal loss
+    box loss => iou, giou
+
+bbox_head:
+    loss, 不同层使用不同的损失函数
+
+
+train_cfg
+    add_gt_as_proposals=False => True
