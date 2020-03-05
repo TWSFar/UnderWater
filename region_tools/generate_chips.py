@@ -73,8 +73,8 @@ class MakeDataset(object):
                                  .format(i + 1, len(samples), img_id))
                 sys.stdout.flush()
 
-                chiplen, loc = self.make_chip(sample, imgset)
-                for i in range(chiplen):
+                loc = self.make_chip(sample, imgset)
+                for i in range(len(loc)):
                     chip_ids.append('{}_{}'.format(img_id, i))
                 chip_loc.update(loc)
 
@@ -210,7 +210,7 @@ class MakeDataset(object):
             image, img_id, imgset, region_box,
             chip_gt_list, chip_label_list, neglect_list)
 
-        return len(region_box), chip_loc
+        return chip_loc
 
     def write_chip_and_anno(self, image, img_id, imgset,
                             chip_list, chip_gt_list,
@@ -218,9 +218,12 @@ class MakeDataset(object):
         """write chips of one image to disk and make xml annotations
         """
         chip_loc = dict()
+        chip_num = 0
         for i, chip in enumerate(chip_list):
-            img_name = '{}_{}.jpg'.format(img_id, i)
-            xml_name = '{}_{}.xml'.format(img_id, i)
+            if len(chip_gt_list[i]) == 0:
+                continue
+            img_name = '{}_{}.jpg'.format(img_id, chip_num)
+            xml_name = '{}_{}.xml'.format(img_id, chip_num)
             chip_loc[img_name] = [int(x) for x in chip]
             chip_size = (chip[2] - chip[0], chip[3] - chip[1])  # w, h
             chip_img = image[chip[1]:chip[3], chip[0]:chip[2], :].copy()
@@ -233,17 +236,15 @@ class MakeDataset(object):
                     random_box = np.random.randint(0, 256, (neg_h, neg_w, 3))
                     chip_img[neg_box[1]:neg_box[3], neg_box[0]:neg_box[2], :] = random_box
 
-            if chip_gt_list is not None:
-                bbox = np.array(chip_gt_list[i], dtype=np.int)
-                label = np.array(chip_label_list[i], dtype=np.str)
-            else:
-                bbox = np.array()
-                label = np.array()
+            bbox = np.array(chip_gt_list[i], dtype=np.int)
+            label = np.array(chip_label_list[i], dtype=np.str)
+
             dom = self.make_xml(chip, bbox, label, img_name, chip_size)
             with open(osp.join(self.anno_dir, xml_name), 'w') as f:
                 f.write(dom.toprettyxml(indent='\t', encoding='utf-8').decode('utf-8'))
 
             cv2.imwrite(osp.join(self.image_dir, img_name), chip_img)
+            chip_num += 1
 
         return chip_loc
 

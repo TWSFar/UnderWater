@@ -61,10 +61,10 @@ def _resize(src_image, dest_path):
     cv2.imwrite(osp.join(dest_path, name), img)
 
 
-def _myaround_up(value, maxv):
-    """0.2 * stride = 3.2"""
+def _myaround_up(value):
+    """0.05 * stride = 0.8"""
     tmp = np.floor(value).astype(np.int32)
-    return min(maxv, tmp + 1 if value - tmp > 0.2 else tmp)
+    return tmp + 1 if value - tmp > 0.05 else tmp
 
 
 def _myaround_down(value):
@@ -84,8 +84,8 @@ def _generate_mask(sample, mask_scale=(30, 40)):
         for box in sample["bboxes"]:
             xmin = _myaround_down(1.0 * box[0] / width * mask_w)
             ymin = _myaround_down(1.0 * box[1] / height * mask_h)
-            xmax = _myaround_up(1.0 * box[2] / width * mask_w, mask_w-1)
-            ymax = _myaround_up(1.0 * box[3] / height * mask_h, mask_h-1)
+            xmax = _myaround_up(1.0 * box[2] / width * mask_w)
+            ymax = _myaround_up(1.0 * box[3] / height * mask_h)
             if xmin == xmax or ymin == ymax:
                 continue
             region_mask[ymin:ymax+1, xmin:xmax+1] = 1

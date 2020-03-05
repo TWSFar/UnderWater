@@ -57,15 +57,14 @@ def Combine():
             detecions[img_name] = [bbox + [score, cls_id]]
 
     output_file = 'DET_results-%s' % args.split + '.csv'
-    if osp.exists(output_dir):
-        shutil.rmtree(output_dir)
-    os.mkdir(output_dir)
+
     with open(output_file, 'w') as f:
         f.writelines("name,image_id,confidence,xmin,ymin,xmax,ymax\n")
         for img_name, det in tqdm(detecions.items()):
             det = nms(det)
             img_id = osp.splitext(img_name)[0] + '.xml'
-            f.writelines(CLASSES[int(box[5])]+','+img_id+','+str(box[4]))
+            for box in det:
+                f.writelines(CLASSES[int(box[5])]+','+img_id+','+str(box[4]))
                 for v in np.round(box[:4]):
                     f.writelines(','+str(int(v)))
                 f.writelines('\n')
