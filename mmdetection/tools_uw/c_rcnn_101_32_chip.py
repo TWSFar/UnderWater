@@ -160,7 +160,7 @@ test_cfg = dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=1000))
 # dataset settings
 dataset_type = 'UndeWaterChipDataset'
-data_root = '/home/twsf/data/UnderWater/region_chip'
+data_root = '/home/twsf/data/UnderWater/region_chip/'
 img_norm_cfg = dict(
    mean=[63.957, 146.672, 84.370], std=[14.162, 28.455, 19.301], to_rgb=True)
 train_pipeline = [
@@ -225,7 +225,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=1.0 / 3,
-    step=[18, 23])
+    step=[30, 34])
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
@@ -236,7 +236,7 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 25
+total_epochs = 36
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './tools_uw/work_dirs/cascade_rcnn_x101_32x4d_fpn_1x'

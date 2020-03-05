@@ -19,10 +19,10 @@ def parse_args():
     parser.add_argument('--result_file', type=str,
                         default="")
     parser.add_argument('--loc_dir', type=str,
-                        default='/home/twsf/data/UnderWater/region_chip/Locations/')
+                        default='/home/twsf/data/UnderWater/test/test_loc/')
     parser.add_argument('--show', action='store_true', help='show results')
     parser.add_argument('--img_dir', type=str, help="show image path",
-                        default="/home/twsf/data/UnderWater/test-A-image")
+                        default="/home/twsf/data/UnderWater/test/images")
     args = parser.parse_args()
     print('# parametes list:')
     for (key, value) in args.__dict__.items():
