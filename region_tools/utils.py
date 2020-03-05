@@ -361,6 +361,41 @@ def show_image(img, labels=None):
     pass
 
 
+def plot_img(img, bboxes, id2name):
+    img = img.astype(np.float64) / 255.0 if img.max() > 1.0 else img
+    for bbox in bboxes:
+        try:
+            if -1 in bbox:
+                continue
+            x1 = int(bbox[0])
+            y1 = int(bbox[1])
+            x2 = int(bbox[2])
+            y2 = int(bbox[3])
+            id = int(bbox[4])
+            label = id2name[id]
+
+            if len(bbox) >= 6:
+                # if bbox[5] < 0.5:
+                #     continue
+                label = label + '|{:.2}'.format(bbox[5])
+
+            # plot
+            box_color = box_colors[min(id, len(box_colors)-1)]
+            text_color = (1, 1, 1)
+            t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_COMPLEX, 0.4, 1)[0]
+            c1 = (x1, y1 - t_size[1] - 4)
+            c2 = (x1 + t_size[0], y1)
+            cv2.rectangle(img, c1, c2, color=box_color, thickness=-1)
+            cv2.putText(img, label, (x1, y1-4), cv2.FONT_HERSHEY_COMPLEX, 0.4, text_color, 1)
+            cv2.rectangle(img, (x1, y1), (x2, y2), color=box_color, thickness=2)
+
+        except Exception as e:
+            print(e)
+            continue
+
+    return img
+
+
 def _boxvis(img, box_list, origin_img=None, binary=True):
     import cv2
     # if binary:

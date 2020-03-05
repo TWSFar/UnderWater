@@ -9,10 +9,11 @@ from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
 from .xml_style import XMLDataset
 from .underwater import UndeWaterDataset
+from .underwaterchip import UndeWaterChipDataset
 
 __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'VOCDataset',
     'GroupSampler', 'DistributedGroupSampler',
     'build_dataloader', 'ConcatDataset', 'RepeatDataset', 'WIDERFaceDataset',
-    'DATASETS', 'build_dataset', 'UndeWaterDataset'
+    'DATASETS', 'build_dataset', 'UndeWaterDataset', 'UndeWaterChipDataset'
 ]
