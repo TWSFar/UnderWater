@@ -13,7 +13,6 @@ class UnderWater(object):
     def __init__(self, db_root):
         self.db_root = db_root
         self.image_set = db_root + '/ImageSets/Main'
-        self.src_testdir = db_root + '/test-A-image'
         self.region_voc_dir = db_root + '/region_mask'
         self.detect_voc_dir = db_root + '/region_chip'
         self.cache_dir = osp.join(db_root, 'cache')
@@ -26,12 +25,8 @@ class UnderWater(object):
     def _get_imglist(self, split='train'):
         """ return list of all image paths
         """
-        if split == "test":
-            return [osp.join(self.db_root, x)
-                    for x in os.listdir(self.src_testdir)]
-        else:
-            with open(osp.join(self.image_set, split+'.txt'), 'r') as f:
-                return [osp.join(self.db_root, IMG_ROOT, x.strip()+'.jpg') for x in f.readlines()]
+        with open(osp.join(self.image_set, split+'.txt'), 'r') as f:
+            return [osp.join(self.db_root, IMG_ROOT, x.strip()+'.jpg') for x in f.readlines()]
 
     def _get_annolist(self, split):
         """ annotation type is '.txt'
@@ -74,13 +69,11 @@ class UnderWater(object):
 
         img_list = self._get_imglist(split)
         sizes = [Image.open(img).size for img in img_list]
-        if "test" in split:
-            samples = [{} for _ in img_list]
-        else:
-            anno_path = [img_path.replace(IMG_ROOT, ANNO_ROOT).replace('jpg', 'xml')
-                         for img_path in img_list]
-            # load information of image and save to cache
-            samples = [self._get_gtbox(ann) for ann in anno_path]
+
+        anno_path = [img_path.replace(IMG_ROOT, ANNO_ROOT).replace('jpg', 'xml')
+                        for img_path in img_list]
+        # load information of image and save to cache
+        samples = [self._get_gtbox(ann) for ann in anno_path]
 
         for i, img_path in enumerate(img_list):
             samples[i]['image'] = img_path  # image path

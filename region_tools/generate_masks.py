@@ -22,7 +22,7 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='VisDrone',
                         choices=['VisDrone'], help='dataset name')
     parser.add_argument('--mode', type=str, default=['train','val'],
-                        nargs='+', help='for train or test')
+                        nargs='+', help='for train or val')
     parser.add_argument('--db_root', type=str,
                         default=user_dir+"/data/UnderWater",
                         # default="E:\\CV\\data\\Underwater\\UnderWater_VOC",
@@ -127,22 +127,21 @@ if __name__ == "__main__":
         with concurrent.futures.ThreadPoolExecutor() as exector:
             exector.map(_copy, img_list, [image_dir]*len(img_list))
 
-        if split == "train" or split == 'val':
-            print('generate {} masks...'.format(split))
-            for sample in tqdm(samples):
-                region_mask = _generate_mask(sample, args.mask_size)
-                basename = osp.basename(sample['image'])
-                maskname = osp.join(mask_dir, osp.splitext(basename)[0]+'.hdf5')
-                with h5py.File(maskname, 'w') as hf:
-                    hf['label'] = region_mask
+        print('generate {} masks...'.format(split))
+        for sample in tqdm(samples):
+            region_mask = _generate_mask(sample, args.mask_size)
+            basename = osp.basename(sample['image'])
+            maskname = osp.join(mask_dir, osp.splitext(basename)[0]+'.hdf5')
+            with h5py.File(maskname, 'w') as hf:
+                hf['label'] = region_mask
 
-                if args.show:
-                    img = cv2.imread(sample['image'])
-                    show_image(img, sample['bboxes'], region_mask)
+            if args.show:
+                img = cv2.imread(sample['image'])
+                show_image(img, sample['bboxes'], region_mask)
 
-            print('copy {} box annos...'.format(split))
-            anno_list = dataset._get_annolist(split)
-            with concurrent.futures.ThreadPoolExecutor() as exector:
-                exector.map(_copy, anno_list, [annotation_dir]*len(anno_list))
+        print('copy {} box annos...'.format(split))
+        anno_list = dataset._get_annolist(split)
+        with concurrent.futures.ThreadPoolExecutor() as exector:
+            exector.map(_copy, anno_list, [annotation_dir]*len(anno_list))
 
         print('done.')

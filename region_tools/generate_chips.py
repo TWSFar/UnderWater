@@ -26,13 +26,12 @@ def parse_args():
                         # default="E:\\CV\\data\\Underwater\\UnderWater_VOC",
                         help="dataset's root path")
     parser.add_argument('--imgsets', type=str, default=['train', 'val'],
-                        nargs='+', help='for train, val or test')
+                        nargs='+', help='for train, val')
     parser.add_argument('--padding', type=str, default=[],
                         nargs='+', help='random padding neglect box')
     parser.add_argument('--show', type=bool, default=False,
                         help="show image and chip box")
     args = parser.parse_args()
-    assert "test" not in args.padding
     return args
 
 
@@ -125,10 +124,9 @@ class MakeDataset(object):
         with open(osp.join(self.list_dir, imgset+'.txt'), 'w') as f:
             f.writelines([x + '\n' for x in img_list])
         print('\n%d images in %s set.' % (len(img_list), imgset))
-        if imgset != "test":
-            with open(osp.join(self.list_dir, 'trainval.txt'), 'a') as f:
-                f.writelines([x + '\n' for x in img_list])
-            print('\n%d images in trainval set.' % len(img_list))
+        with open(osp.join(self.list_dir, 'trainval.txt'), 'a') as f:
+            f.writelines([x + '\n' for x in img_list])
+        print('\n%d images in trainval set.' % len(img_list))
 
     def make_xml(self, chip, bboxes, labels, image_name, chip_size):
         node_root = Element('annotation')
@@ -204,10 +202,7 @@ class MakeDataset(object):
         # if imgset == 'train':
         #     region_box = np.vstack((region_box, np.array([0, 0, width-1, height-1])))
 
-        if "test" in imgset:
-            gt_bboxes, gt_cls = None, None
-        else:
-            gt_bboxes, gt_cls = sample['bboxes'], sample['cls']
+        gt_bboxes, gt_cls = sample['bboxes'], sample['cls']
 
         chip_gt_list, chip_label_list, neglect_list = self.generate_region_gt(
             region_box, gt_bboxes, gt_cls)
