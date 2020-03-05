@@ -13,19 +13,23 @@ from xml.etree.ElementTree import Element, SubElement, tostring
 from xml.dom.minidom import parseString
 
 import utils
-from .datasets.underwater import UnderWater
+from datasets.underwater import UnderWater
 user_dir = osp.expanduser('~')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description="convert to voc dataset")
-    parser.add_argument('--db_root', type=str, default=user_dir+"/data/Visdrone",
+    parser.add_argument('--dataset', type=str, default='UnderWater',
+                        choices=['UnderWater'], help='dataset name')
+    parser.add_argument('--db_root', type=str,
+                        # default=user_dir+"/data/Visdrone",
+                        default="E:\\CV\\data\\Underwater\\UnderWater_VOC",
                         help="dataset's root path")
     parser.add_argument('--imgsets', type=str, default=['train', 'val'],
                         nargs='+', help='for train, val or test')
     parser.add_argument('--padding', type=str, default=[],
                         nargs='+', help='random padding neglect box')
-    parser.add_argument('--show', type=bool, default=False,
+    parser.add_argument('--show', type=bool, default=True,
                         help="show image and chip box")
     args = parser.parse_args()
     assert "test" not in args.padding
@@ -236,7 +240,7 @@ class MakeDataset(object):
 
             if chip_gt_list is not None:
                 bbox = np.array(chip_gt_list[i], dtype=np.int)
-                label = np.array(chip_label_list[i], dtype=np.int)
+                label = np.array(chip_label_list[i], dtype=np.str)
             else:
                 bbox = np.array()
                 label = np.array()
