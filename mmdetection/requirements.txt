@@ -1,4 +1,4 @@
--r requirements/build.txt
--r requirements/optional.txt
--r requirements/runtime.txt
--r requirements/tests.txt
+recommonmark
+sphinx
+sphinx_markdown_tables
+sphinx_rtd_theme

@@ -22,14 +22,14 @@ def parse_args():
     parser.add_argument('--dataset', type=str, default='UnderWater',
                         choices=['UnderWater'], help='dataset name')
     parser.add_argument('--db_root', type=str,
-                        # default=user_dir+"/data/Visdrone",
-                        default="E:\\CV\\data\\Underwater\\UnderWater_VOC",
+                        default=user_dir+"/data/UnderWater",
+                        # default="E:\\CV\\data\\Underwater\\UnderWater_VOC",
                         help="dataset's root path")
     parser.add_argument('--imgsets', type=str, default=['train', 'val'],
                         nargs='+', help='for train, val or test')
     parser.add_argument('--padding', type=str, default=[],
                         nargs='+', help='random padding neglect box')
-    parser.add_argument('--show', type=bool, default=True,
+    parser.add_argument('--show', type=bool, default=False,
                         help="show image and chip box")
     args = parser.parse_args()
     assert "test" not in args.padding
