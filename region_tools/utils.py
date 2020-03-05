@@ -396,17 +396,6 @@ def plot_img(img, bboxes, id2name):
     return img
 
 
-def _boxvis(img, box_list, origin_img=None, binary=True):
-    import cv2
-    # if binary:
-    #     ret, img = cv.threshold(img, 0, 255, cv.THRESH_BINARY)
-    for box in box_list:
-        cv2.rectangle(img, (box[0], box[1]), (box[2], box[3]), color=(255, 255, 255), thickness=1)
-    # plt.subplot(1, 2, 1)
-    plt.imshow(img)
-    plt.show()
-
-
 class MyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.integer):
@@ -423,4 +412,3 @@ if __name__ == "__main__":
     mask = np.zeros((4, 4, 3), dtype=np.int)
     labels = np.array([[1, 1, 3, 3]])
     # show_image(mask)
-    _boxvis(mask, labels)
