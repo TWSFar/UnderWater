@@ -1,0 +1,14 @@
+# compile file of python
+*.py[cod]
+_pycache_
+*$py.class
+
+# C extensions
+*.so
+
+# My configurations:
+run/
+.vscode/
+debug/
+.debug.py
+results/

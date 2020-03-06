@@ -5,7 +5,7 @@ from .dataset_utils import (get_label_box, generate_box_from_mask,
 
 
 class Evaluator(object):
-    def __init__(self, num_class):
+    def __init__(self, num_class=2):
         self.num_class = num_class
         self.confusion_matrix = np.zeros((self.num_class,)*2)
         self.label_object = []

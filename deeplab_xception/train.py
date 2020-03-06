@@ -5,7 +5,6 @@ import collections
 import numpy as np
 from tqdm import tqdm
 
-
 from configs.deeplabv3_region import opt
 # from configs.deeplabv3_density import opt
 
@@ -15,7 +14,8 @@ from models.losses import build_loss
 from dataloaders import make_data_loader
 from models.utils import Evaluator, LR_Scheduler
 
-from utils import (Saver, Timer, TensorboardSummary)
+from utils import (Saver, Timer, TensorboardSummary
+                   calculate_weigths_labels)
 import torch
 
 import multiprocessing
@@ -36,7 +36,6 @@ class Trainer(object):
         # Dataset dataloader
         self.train_dataset, self.train_loader = make_data_loader(opt)
         self.nbatch_train = len(self.train_loader)
-        self.nclass = self.train_dataset.nclass
         self.val_dataset, self.val_loader = make_data_loader(opt, mode="val")
         self.nbatch_val = len(self.val_loader)
 
@@ -56,10 +55,20 @@ class Trainer(object):
                                          weight_decay=opt.decay)
 
         # loss
+        if opt.use_balanced_weights:
+            classes_weights_file = osp.join(opt.root_dir, 'train_classes_weights.npy')
+            if os.path.isfile(classes_weights_file):
+                weight = np.load(classes_weights_file)
+            else:
+                weight = calculate_weigths_labels(
+                    self.train_loader, opt.root_dir, opt.num_classes)
+            weight = torch.from_numpy(weight.astype(np.float32))
+            print(weight)
+        opt.loss['weight'] = weight
         self.loss = build_loss(opt.loss)
 
         # Define Evaluator
-        self.evaluator = Evaluator(self.nclass)
+        self.evaluator = Evaluator()
 
         # Define lr scheduler
         self.scheduler = LR_Scheduler(mode=opt.lr_scheduler,
@@ -97,9 +106,9 @@ class Trainer(object):
         if opt.freeze_bn:
             self.model.module.freeze_bn() if len(opt.gpu_id) > 1 \
                 else self.model.freeze_bn()
+        last_time = time.time()
         for iter_num, sample in enumerate(self.train_loader):
             # if iter_num >= 1: break
-            last_time = time.time()
             try:
                 imgs = sample["image"].to(opt.device)
                 labels = sample["label"].to(opt.device)
@@ -179,8 +188,7 @@ class Trainer(object):
                 target = labels.cpu().numpy() > 0
                 if pred.shape[1] > 1:
                     pred = np.argmax(pred, axis=1)
-                else:
-                    pred = (pred > opt.region_thd).reshape(target.shape)
+                pred = (pred > opt.region_thd).reshape(target.shape)
                 self.evaluator.add_batch(target, pred, path, opt.dataset)
 
             # Fast test during the training
