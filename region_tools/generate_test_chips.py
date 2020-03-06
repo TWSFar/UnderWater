@@ -9,8 +9,6 @@ import json
 import argparse
 import numpy as np
 import os.path as osp
-from xml.etree.ElementTree import Element, SubElement, tostring
-from xml.dom.minidom import parseString
 
 import utils
 user_dir = osp.expanduser('~')

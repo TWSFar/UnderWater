@@ -1,8 +1,6 @@
 import os
 import cv2
-import pdb
 import json
-import shutil
 import argparse
 import numpy as np
 import os.path as osp
