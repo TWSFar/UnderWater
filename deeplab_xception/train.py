@@ -14,7 +14,7 @@ from models.losses import build_loss
 from dataloaders import make_data_loader
 from models.utils import Evaluator, LR_Scheduler
 
-from utils import (Saver, Timer, TensorboardSummary
+from utils import (Saver, Timer, TensorboardSummary,
                    calculate_weigths_labels)
 import torch
 
@@ -56,7 +56,7 @@ class Trainer(object):
 
         # loss
         if opt.use_balanced_weights:
-            classes_weights_file = osp.join(opt.root_dir, 'train_classes_weights.npy')
+            classes_weights_file = os.path.join(opt.root_dir, 'train_classes_weights.npy')
             if os.path.isfile(classes_weights_file):
                 weight = np.load(classes_weights_file)
             else:
@@ -158,6 +158,7 @@ class Trainer(object):
         with torch.no_grad():
             tbar = tqdm(self.val_loader, desc='\r')
             for i, sample in enumerate(tbar):
+                # if i > 3: break
                 imgs = sample['image'].to(opt.device)
                 labels = sample['label'].to(opt.device)
                 path = sample["path"]

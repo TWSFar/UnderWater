@@ -33,7 +33,7 @@ class UnderWater(object):
         return list of all image annotation path
         """
         img_list = self._get_imglist(split)
-        return [img.replace(IMG_ROOT, ANNO_ROOT).replace('jpg', 'txt')
+        return [img.replace(IMG_ROOT, ANNO_ROOT).replace('jpg', 'xml')
                 for img in img_list]
 
     def _get_gtbox(self, anno_path):

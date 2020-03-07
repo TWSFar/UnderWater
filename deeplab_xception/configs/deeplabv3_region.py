@@ -47,6 +47,10 @@ class Config:
     scales = 0.3
     workers = 12
 
+    # eval
+    # parameters
+    region_thd = 0.5
+
     # visual
     print_freq = 50
     plot_every = 100  # every n batch plot
