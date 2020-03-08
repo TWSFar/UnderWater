@@ -7,17 +7,17 @@ import os.path as osp
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from utils import nms, plot_img
-CLASSES = ('holothurian', 'echinus', 'scallop', 'starfish')
+from utils import nms, plot_img, show_image
+CLASSES = ('holothurian', 'echinus', 'scallop', 'starfish' 'region')
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='UnderWaterDataset submit')
     parser.add_argument('--split', type=str, default='test', help='split')
     parser.add_argument('--result_file', type=str,
-                        default="")
+                        default="/home/twsf/data/UnderWater/val/results.json")
     parser.add_argument('--loc_dir', type=str,
-                        default='/home/twsf/data/UnderWater/test/test_loc/')
+                        default='/home/twsf/data/UnderWater/val/region_loc/')
     parser.add_argument('--show', action='store_true', help='show results')
     parser.add_argument('--img_dir', type=str, help="show image path",
                         default="/home/twsf/data/UnderWater/test/images")
@@ -47,7 +47,6 @@ def Combine():
         score = det['score']
         loc = chip_loc[img_id]
         bbox = [bbox[0] + loc[0], bbox[1] + loc[1], bbox[2] + loc[0], bbox[3] + loc[1]]
-
         img_name = '_'.join(img_id.split('_')[:-1]) + osp.splitext(img_id)[1]
         if img_name in detecions:
             detecions[img_name].append(bbox + [score, cls_id])
@@ -59,7 +58,7 @@ def Combine():
     with open(output_file, 'w') as f:
         f.writelines("name,image_id,confidence,xmin,ymin,xmax,ymax\n")
         for img_name, det in tqdm(detecions.items()):
-            det = nms(det)
+            det = nms(det, score_threshold=0.5)
             img_id = osp.splitext(img_name)[0] + '.xml'
             for box in det:
                 f.writelines(CLASSES[int(box[5])]+','+img_id+','+str(box[4]))
@@ -71,6 +70,7 @@ def Combine():
                 img_path = osp.join(args.img_dir, img_name)
                 img = cv2.imread(img_path)[:, :, ::-1]
                 bboxes = det[:, [0, 1, 2, 3, 5, 4]]
+                # show_image(img, bboxes)
                 img = plot_img(img, bboxes, CLASSES)
                 plt.figure(figsize=(10, 10))
                 plt.subplot(1, 1, 1).imshow(img)

@@ -10,11 +10,11 @@ from tqdm import tqdm
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a detector')
-    parser.add_argument('checkpoints', help='model')
-    parser.add_argument('--config',
-        default='/home/twsf/data/UnderWater/mmdetection/tools_uw/c_rcnn_101_32_chip.py')
-    parser.add_argument('--test-dir', default='/home/twsf/data/UnderWater/test-A-image/')
-    parser.add_argument('--result-path', default='/home/twsf/data/UnderWater/')
+    parser.add_argument('checkpoint', help='model')
+    parser.add_argument('--config', default='/home/twsf/work/underwater/mmdetection/tools_uw/c_rcnn_101_32_chip.py')
+    parser.add_argument('--test-dir', default='/home/twsf/data/UnderWater/val/region_chip')
+    parser.add_argument('--result-path', default='/home/twsf/data/UnderWater/val')
+    args = parser.parse_args()
     return args
 
 
@@ -30,17 +30,19 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-def main():
+if __name__ == "__main__":
     args = parse_args()
+    if not osp.exists(args.result_path):
+        os.makedirs(args.result_path)
+
     # build the model from a config file and a checkpoint file
-    model = init_detector(args.config_file, args.checkpoint_file, device='cuda:0')
+    model = init_detector(args.config, args.checkpoint, device='cuda:0')
 
     img_list = os.listdir(args.test_dir)
     results = []
 
-    f.writelines("name,image_id,confidence,xmin,ymin,xmax,ymax\n")
     for img_name in tqdm(img_list):
-        img_path = osp.join(test_dir, img_name)
+        img_path = osp.join(args.test_dir, img_name)
         result = inference_detector(model, img_path)
         for i, boxes in enumerate(result):
             for box in boxes:
@@ -50,6 +52,6 @@ def main():
                                 "score": box[4]})
         # show_result(img_path, result, model.CLASSES)
 
-    with open(os.path.join(args.reults_path, 'results.json'), "w") as f:
+    with open(os.path.join(args.result_path, 'results.json'), "w") as f:
         json.dump(results, f, cls=MyEncoder)
         print("results json saved.")

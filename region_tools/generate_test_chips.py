@@ -17,8 +17,8 @@ user_dir = osp.expanduser('~')
 def parse_args():
     parser = argparse.ArgumentParser(description="convert to chip dataset")
     parser.add_argument('--test_dir', type=str,
-                        # default=user_dir+"/data/UnderWater/test",
-                        default="E:\\CV\\data\\Underwater\\test")
+                        default=user_dir+"/data/UnderWater/val")
+                        # default="E:\\CV\\data\\Underwater\\test")
     parser.add_argument('--show', type=bool, default=False,
                         help="show image and chip box")
     args = parser.parse_args()
@@ -80,6 +80,10 @@ class MakeDataset(object):
         region_box = utils.region_postprocess(region_box, contours, (mask_w, mask_h))
         region_box = utils.resize_box(region_box, (mask_w, mask_h), (width, height))
         region_box = utils.generate_crop_region(region_box, (width, height))
+        try:
+            region_box = np.vstack((region_box, np.array([0, 0, width-1, height-1])))
+        except:
+            print("empty box")
 
         if args.show:
             utils.show_image(image, region_box)

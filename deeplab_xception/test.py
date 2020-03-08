@@ -19,10 +19,10 @@ from torchvision import transforms
 import multiprocessing
 multiprocessing.set_start_method('spawn', True)
 show = False
-results_dir = osp.join(opt.test_dir, "test_mask")
-images_dir = osp.join(opt.test_dir, "images")
-# results_dir = "E:\\CV\\data\\Underwater\\test\\test_mask_test"
-# images_dir = "E:\\CV\\data\\Underwater\\test\\images"
+# results_dir = osp.join(opt.test_dir, "region_mask")
+# images_dir = osp.join(opt.test_dir, "images")
+results_dir = "/home/twsf/data/UnderWater/val"
+images_dir = "/home/twsf/data/UnderWater/val/images"
 
 
 def test(**kwargs):

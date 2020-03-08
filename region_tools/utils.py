@@ -311,7 +311,7 @@ def iou_calc2(boxes1, boxes2):
     return IOU
 
 
-def nms(prediction, score_threshold=0.005, iou_threshold=0.5, overlap_threshold=0.95):
+def nms(prediction, score_threshold=0.05, iou_threshold=0.5, overlap_threshold=0.95):
     """
     :param prediction:
     (x, y, w, h, conf, cls)
@@ -395,7 +395,7 @@ def plot_img(img, bboxes, id2name):
             c2 = (x1 + t_size[0], y1)
             cv2.rectangle(img, c1, c2, color=box_color, thickness=-1)
             cv2.putText(img, label, (x1, y1-4), cv2.FONT_HERSHEY_COMPLEX, 0.4, text_color, 1)
-            cv2.rectangle(img, (x1, y1), (x2, y2), color=box_color, thickness=2)
+            cv2.rectangle(img, (x1, y1), (x2, y2), color=box_color, thickness=3)
 
         except Exception as e:
             print(e)

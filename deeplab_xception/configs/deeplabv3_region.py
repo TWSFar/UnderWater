@@ -15,7 +15,7 @@ class Config:
     # mean = (0.485, 0.456, 0.406)
     # std = (0.229, 0.224, 0.225)
     resume = False
-    pre = "/home/twsf/work/CRGNet/run/visdrone/20200102_230256_train/model_best.pth.tar"
+    pre = "/home/twsf/work/underwater/deeplab_xception/model_best.pth.tar"
 
     # model
     backbone = 'mobilenetv2'
