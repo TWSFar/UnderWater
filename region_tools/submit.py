@@ -8,7 +8,11 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 
 from utils import nms, plot_img, show_image
+<<<<<<< HEAD
 CLASSES = ('holothurian', 'echinus', 'scallop', 'starfish' 'region')
+=======
+CLASSES = ('holothurian', 'echinus', 'scallop', 'starfish')
+>>>>>>> 015c8d1382bd67415933832c3b6d9d92e3efb5f1
 
 
 def parse_args():

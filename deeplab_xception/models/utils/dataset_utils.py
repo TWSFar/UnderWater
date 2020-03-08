@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+import xml.etree.ElementTree as ET
 
 
 def get_label_box(img_path, dataset):
@@ -16,9 +17,31 @@ def get_label_box(img_path, dataset):
         y[:, 1] = boxes[:, 1]
         y[:, 2] = boxes[:, 0] + boxes[:, 2]
         y[:, 3] = boxes[:, 1] + boxes[:, 3]
+
+        return y
+
+    elif dataset in ['UnderWater', 'Underwater', 'underwater']:
+        anno_path = img_path.replace('JPEGImages', 'Annotations')
+        anno_path = anno_path.replace('jpg', 'xml')
+        xml = ET.parse(anno_path).getroot()
+        box_all = []
+        pts = ['xmin', 'ymin', 'xmax', 'ymax']
+        # bounding boxes
+        for obj in xml.iter('object'):
+            cls = obj.find('name').text
+            if cls == "waterweeds":
+                continue
+            bbox = obj.find('bndbox')
+            bndbox = []
+            for i, pt in enumerate(pts):
+                cur_pt = int(bbox.find(pt).text) - 1
+                bndbox.append(cur_pt)
+            box_all += [bndbox]
+
+        return np.array(box_all).astype(np.int32)
+
     else:
         raise NotImplementedError
-    return y
 
 
 def generate_box_from_mask(mask):

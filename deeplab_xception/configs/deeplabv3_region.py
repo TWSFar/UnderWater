@@ -14,6 +14,7 @@ class Config:
     std = [14.162/255, 28.455/255, 19.301/255]
     # mean = (0.485, 0.456, 0.406)
     # std = (0.229, 0.224, 0.225)
+    num_classes = 2
     resume = False
     pre = "/home/twsf/work/underwater/deeplab_xception/model_best.pth.tar"
 
@@ -33,11 +34,11 @@ class Config:
     loss = dict(
         type="CrossEntropyLoss",
         ignore_index=-1,
-        weight=[1, 2]
+        weight=None
     )
 
     # param for optimizer
-    use_balanced_weights = False
+    use_balanced_weights = True
     lr_scheduler = 'step'  # choices = 'poly', 'step', 'cos'
     lr = 0.0005
     momentum = 0.9
@@ -45,6 +46,10 @@ class Config:
     steps = [0.8, 0.9]
     scales = 0.3
     workers = 12
+
+    # eval
+    # parameters
+    region_thd = 0.5
 
     # visual
     print_freq = 50
