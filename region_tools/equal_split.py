@@ -18,7 +18,8 @@ def parse_args():
     parser = argparse.ArgumentParser(description="convert to chip dataset")
     parser.add_argument('--test_dir', type=str,
                         default=user_dir+"/data/UnderWater/val")
-                        # default="E:\\CV\\data\\Underwater\\test")
+    parser.add_argument('--side', type=int, default=800, help="window base side")
+    parser.add_argument('--stride', type=int, default=600, help="window stride")
     parser.add_argument('--show', type=bool, default=False,
                         help="show image and chip box")
     args = parser.parse_args()
@@ -71,7 +72,7 @@ class MakeDataset(object):
         img_id = osp.splitext(osp.basename(img_name))[0]
 
         # make chip
-        region_box = []
+        region_box = self.shift(width, height)
 
         if args.show:
             utils.show_image(image, region_box)
@@ -79,6 +80,27 @@ class MakeDataset(object):
         chip_loc = self.write_chip_and_anno(image, img_id, region_box)
 
         return len(region_box), chip_loc
+
+    def shift(self, width, height):
+        side = args.side
+        stride = args.stride
+        w_num = max(round((width - (side - stride)) / stride), 1)
+        w_len = np.ceil(width / w_num) + (side - stride)
+        h_num = max(round((height - (side - stride)) / stride), 1)
+        h_len = np.ceil(height / h_num) + (side - stride)
+
+        shift_w = np.arange(0, w_num) * stride
+        shift_h = np.arange(0, h_num) * stride
+
+        shift_w, shift_h = np.meshgrid(shift_w, shift_h)
+        shifts = np.vstack((
+            shift_w.ravel(), shift_h.ravel(),
+            shift_w.ravel(), shift_h.ravel()
+        )).transpose()
+        shifts[:, 2] = (shifts[:, 2] + w_len).clip(0, width)
+        shifts[:, 3] = (shifts[:, 3] + h_len).clip(0, height)
+
+        return shifts
 
     def write_chip_and_anno(self, image, img_id, chip_list):
         """write chips of one image to disk and make xml annotations
