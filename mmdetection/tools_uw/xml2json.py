@@ -11,7 +11,7 @@ from collections import OrderedDict
 hyp = {
     'dataset': 'UnderWater',
     'img_type': '.jpg',
-    'mode': 'train',  # for save instance_train.json
+    'mode': 'val',  # for save instance_train.json
     'data_dir': '/home/twsf/data/UnderWater',
 }
 hyp['json_dir'] = osp.join(hyp['data_dir'], 'Annotations_json')

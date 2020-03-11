@@ -2,12 +2,12 @@
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    pretrained='open-mmlab://resnext101_32x4d',
+    pretrained='https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net101_v1b_26w_4s-0812c246.pth',
     backbone=dict(
-        type='ResNeXt',
+        type='Res2Net',
         depth=101,
-        groups=32,
-        base_width=4,
+        scale=4,
+        baseWidth=26,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -175,7 +175,11 @@ train_pipeline = [
         type='MinIoURandomCrop',
         min_ious=(0.1, 0.3, 0.5, 0.7, 0.9),
         min_crop_size=0.3),
-    dict(type='Resize', img_scale=(1700, 1500), keep_ratio=True),
+    dict(
+        type='Resize',
+        img_scale=[(1700, 1500), (1333, 960)],
+        keep_ratio=True,
+        multiscale_mode='range'),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
@@ -186,7 +190,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1700, 1500),
+        img_scale=(1600, 1400),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -225,7 +229,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=1.0 / 3,
-    step=[18, 23])
+    step=[28, 33])
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(
@@ -236,7 +240,7 @@ log_config = dict(
     ])
 # yapf:enable
 # runtime settings
-total_epochs = 25
+total_epochs = 36
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './tools_uw/work_dirs/cascade_rcnn_x101_32x4d_fpn_1x'

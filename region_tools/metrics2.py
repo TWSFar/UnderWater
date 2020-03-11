@@ -12,8 +12,7 @@ import matplotlib.pyplot as plt
 import xml.etree.ElementTree as ET
 from utils import nms
 ANNOTATION_DIR = "/home/twsf/data/UnderWater/val/labels/"
-CHIP_RESULT_FILE = "/home/twsf/data/UnderWater/val/results2.json"
-LOCATION_FILE = "/home/twsf/data/UnderWater/val/region_loc/test_chip.json"
+RESULT_FILE = "/home/twsf/data/UnderWater/val/results.json"
 CLASSES = ('holothurian', 'echinus', 'scallop', 'starfish')
 show = False
 IMAGE_DIR = "/home/twsf/data/UnderWater/val/images/"
@@ -243,10 +242,9 @@ class DET_toolkit(object):
         def_eval = DefaultEval()
 
         # get val predict box
-        with open(CHIP_RESULT_FILE, 'r') as f:
+        with open(RESULT_FILE, 'r') as f:
             results = json.load(f)
-        with open(LOCATION_FILE, 'r') as f:
-            detecions = dict()
+        detecions = dict()
         for det in tqdm(results):
             img_id = det['image_id']
             cls_id = det['category_id']
@@ -260,12 +258,14 @@ class DET_toolkit(object):
 
         # metrics
         for img_name, det in tqdm(detecions.items()):
-            pred_bbox = nms(det, score_threshold=0.5)[:, [0, 1, 2, 3, 5, 4]].astype(np.float32)
+            pred_bbox = nms(det, iou_threshold=1, overlap_threshold=1)[:, [0, 1, 2, 3, 5, 4]].astype(np.float32)
+            # pred_bbox = np.array(det)[:, [0, 1, 2, 3, 5, 4]].astype(np.float32)
             gt_bbox = self.load_anno(osp.join(self.gt_dir, img_name[:-4]+'.xml'))
 
             def_eval.statistics(
                 torch.tensor(pred_bbox).unsqueeze(0),
-                torch.tensor(gt_bbox).unsqueeze(0))
+                torch.tensor(gt_bbox).unsqueeze(0),
+                iou_thresh=0.75)
 
             if show:
                 img = cv2.imread(osp.join(self.img_dir, img_name))[:, :, ::-1]

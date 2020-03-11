@@ -2,12 +2,12 @@
 model = dict(
     type='CascadeRCNN',
     num_stages=3,
-    pretrained='open-mmlab://resnext101_32x4d',
+    pretrained='https://shanghuagao.oss-cn-beijing.aliyuncs.com/res2net/res2net101_v1b_26w_4s-0812c246.pth',
     backbone=dict(
-        type='ResNeXt',
+        type='Res2Net',
         depth=101,
-        groups=32,
-        base_width=4,
+        scale=4,
+        baseWidth=26,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -159,8 +159,8 @@ test_cfg = dict(
     rcnn=dict(
         score_thr=0.05, nms=dict(type='nms', iou_thr=0.5), max_per_img=1000))
 # dataset settings
-dataset_type = 'UndeWaterChipDataset'
-data_root = '/home/twsf/data/UnderWater/region_chip/'
+dataset_type = 'UndeWaterDataset'
+data_root = '/home/twsf/data/UnderWater/'
 img_norm_cfg = dict(
    mean=[63.957, 146.672, 84.370], std=[14.162, 28.455, 19.301], to_rgb=True)
 train_pipeline = [
@@ -175,7 +175,11 @@ train_pipeline = [
         type='MinIoURandomCrop',
         min_ious=(0.1, 0.3, 0.5, 0.7, 0.9),
         min_crop_size=0.3),
-    dict(type='Resize', img_scale=(1600, 1600), keep_ratio=True),
+    dict(
+        type='Resize',
+        img_scale=[(1700, 1500), (1333, 960)],
+        keep_ratio=True,
+        multiscale_mode='range'),
     dict(type='RandomFlip', flip_ratio=0.5),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='Pad', size_divisor=32),
@@ -186,7 +190,7 @@ test_pipeline = [
     dict(type='LoadImageFromFile'),
     dict(
         type='MultiScaleFlipAug',
-        img_scale=(1600, 1600),
+        img_scale=(1600, 1400),
         flip=False,
         transforms=[
             dict(type='Resize', keep_ratio=True),
@@ -202,20 +206,20 @@ data = dict(
     workers_per_gpu=1,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'ImageSets/Main/train.txt',
-        img_prefix=data_root,
+        ann_file=data_root + 'Annotations_json/instances_train.json',
+        img_prefix=data_root + 'JPEGImages',
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
-        ann_file=data_root + 'ImageSets/Main/val.txt',
-        img_prefix=data_root,
+        ann_file=data_root + 'Annotations_json/instances_val.json',
+        img_prefix=data_root + 'JPEGImages',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         ann_file=data_root + 'ImageSets/Main/test.txt',
         img_prefix=data_root,
         pipeline=test_pipeline))
-evaluation = dict(interval=1, metric='mAP')
+evaluation = dict(interval=1, metric='bbox')
 # optimizer
 optimizer = dict(type='SGD', lr=0.0002, momentum=0.9, weight_decay=0.0001)
 optimizer_config = dict(grad_clip=dict(max_norm=35, norm_type=2))
@@ -225,7 +229,7 @@ lr_config = dict(
     warmup='linear',
     warmup_iters=500,
     warmup_ratio=1.0 / 3,
-    step=[30, 34])
+    step=[28, 33])
 checkpoint_config = dict(interval=1)
 # yapf:disable
 log_config = dict(

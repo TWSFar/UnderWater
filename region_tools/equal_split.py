@@ -17,7 +17,7 @@ user_dir = osp.expanduser('~')
 def parse_args():
     parser = argparse.ArgumentParser(description="convert to chip dataset")
     parser.add_argument('--test_dir', type=str,
-                        default=user_dir+"/data/UnderWater/val")
+                        default=user_dir+"/data/UnderWater/test")
     parser.add_argument('--side', type=int, default=800, help="window base side")
     parser.add_argument('--stride', type=int, default=600, help="window stride")
     parser.add_argument('--show', type=bool, default=False,
@@ -33,7 +33,6 @@ print(args)
 class MakeDataset(object):
     def __init__(self):
         self.img_dir = osp.join(args.test_dir, "images")
-        self.mask_dir = osp.join(args.test_dir, "region_mask")
         self.chip_dir = osp.join(args.test_dir, "region_chip")
         self.loc_dir = osp.join(args.test_dir, "region_loc")
         self._init_path()
@@ -72,7 +71,16 @@ class MakeDataset(object):
         img_id = osp.splitext(osp.basename(img_name))[0]
 
         # make chip
-        region_box = self.shift(width, height)
+        if max(height, width) < 1200:
+            side = min(height, width)
+            stride = max(side - 100, 100)
+        elif max(height, width) < 2200:
+            side = max(height, width) * 0.5
+            stride = max(side - 300, 300)
+        else:
+            side = max(height, width) * 0.4
+            stride = max(side - 300, 500)
+        region_box = self.shift(width, height, side, stride)
 
         if args.show:
             utils.show_image(image, region_box)
@@ -81,9 +89,7 @@ class MakeDataset(object):
 
         return len(region_box), chip_loc
 
-    def shift(self, width, height):
-        side = args.side
-        stride = args.stride
+    def shift(self, width, height, side, stride):
         w_num = max(round((width - (side - stride)) / stride), 1)
         w_len = np.ceil(width / w_num) + (side - stride)
         h_num = max(round((height - (side - stride)) / stride), 1)
@@ -100,7 +106,7 @@ class MakeDataset(object):
         shifts[:, 2] = (shifts[:, 2] + w_len).clip(0, width)
         shifts[:, 3] = (shifts[:, 3] + h_len).clip(0, height)
 
-        return shifts
+        return shifts.astype(np.int32)
 
     def write_chip_and_anno(self, image, img_id, chip_list):
         """write chips of one image to disk and make xml annotations
